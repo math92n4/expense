@@ -1,10 +1,16 @@
 <script>
+    import { onMount } from "svelte";
     import { fetchPost } from "../util/api";
     import { navigate } from "svelte-routing";
+    import { authenticated } from "../stores/auth";
 
     let email = '';
     let password = '';
     let errorMessage = ''
+
+    onMount(async () => {
+        authenticated.set(false)
+    })
 
     async function login() {
         const login = await fetchPost('/api/login', { email, password })

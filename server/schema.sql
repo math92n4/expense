@@ -32,10 +32,11 @@ CREATE TABLE expense (
 );
 
 CREATE TABLE invites (
+  invite_id INT AUTO_INCREMENT PRIMARY KEY,
 	sent_from INT,
-    sent_to INT,
-    group_id INT,
-    FOREIGN KEY (sent_from) REFERENCES users(user_id),
-    FOREIGN KEY (sent_to) REFERENCES users(user_id),
-    FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
+  sent_to INT,
+  group_id INT,
+  FOREIGN KEY (sent_from) REFERENCES users(user_id),
+  FOREIGN KEY (sent_to) REFERENCES users(user_id),
+  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
 );

@@ -16,6 +16,8 @@
         if(postGroup.status === 401) {
             navigate('/login')
             return;
+        } else {
+            navigate('/mygroups')
         }  
     }
 

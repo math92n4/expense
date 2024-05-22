@@ -54,7 +54,7 @@ router.post('/api/login', async (req, res) => {
 
     res.cookie('jwt', token, {
         httpOnly: true,
-        maxAge: 5000
+        maxAge: 50000
     })
 
     return res.send({ data: {email, userId } })

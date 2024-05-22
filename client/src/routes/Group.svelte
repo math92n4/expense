@@ -7,7 +7,6 @@
   
     export let groupId;
     let group = null;
-    let email
     let memberMessage = ""
     let expenses = [];
     let totalExpense;
@@ -51,23 +50,38 @@
       }
     }
 
+    let addedEmail;
+
+
     async function addMember() {
-      const userRes = await fetchGet(`/api/user/`)
-      console.log(userRes)
+      let addedUserId;
+      const existingMember = await fetchGet(`/api/user/${addedEmail}`)
+      console.log(existingMember)
 
-      if(userRes.status === 200) {
-        const user = userRes.data.data;
-        const addedUserId = user.user_id;
+      if(existingMember.status === 401) {
+        navigate('/login')
+        return;
+      }
 
-        const postMember = await fetchPost("/api/member", { addedUserId, groupId })
+      if(existingMember.status === 404) {
+        memberMessage = existingMember.data.data;
+      } else {
+        addedUserId = existingMember.data.data.user_id;
+      }
 
-        if(postMember.status === 200) {
-          memberMessage = `${email} has been invited`
+      const isMember = await fetchGet(`/api/group/ismember/${addedUserId}/${groupId}`)
+      if(isMember.data === false) {
+        const sendInvite = await fetchPost('/api/invite', { addedUserId, groupId })
+        if(sendInvite.status === 401) {
+          navigate('/login')
           return;
         }
-      } else if(userRes.status === 404) {
-        memberMessage = `${userRes.data.data} with email ${email}`
+        memberMessage = `An invite has been sent to ${addedEmail}`
+        console.log(sendInvite)
+      } else {
+        memberMessage = 'User is already part of the group'
       }
+
     }
 
     async function deleteExpense(expenseId) {
@@ -89,7 +103,7 @@
   
   <form class="login" on:submit|preventDefault={addMember}>
     <label for="email">Email</label>
-    <input bind:value={email} />
+    <input bind:value={addedEmail} />
     <button type="submit">Add member</button>
     {#if memberMessage}
     <p class='error'>{memberMessage}</p>

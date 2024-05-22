@@ -23,6 +23,13 @@ router.get('/api/group/ismember/:groupId', authenticate, async (req, res) => {
     return res.send(member)
 })
 
+router.get('/api/group/ismember/:userId/:groupId', authenticate, async (req, res) => {
+    const userId = req.params.userId;
+    const groupId = req.params.groupId;
+    const member = await isMember(userId, groupId);
+    return res.send(member)
+})
+
 router.post('/api/group', authenticate, async (req, res) => {
     const { userId } = req.claims
     const { groupName, groupDesc } = req.body;

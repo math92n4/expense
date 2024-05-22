@@ -2,7 +2,7 @@
     import { onMount } from 'svelte'
     import { authenticated } from '../stores/auth.js';
     import { navigate } from 'svelte-routing';
-    import { fetchGet } from '../util/api.js'
+    import { fetchDelete, fetchGet, fetchPost } from '../util/api.js'
     
     let groups = [];
     let invites = [];
@@ -20,10 +20,31 @@
         console.log(groupRes)
         groups = groupRes.data;
 
+        const inviteRes = await fetchGet('/api/invite')
+        invites = inviteRes.data;
+
 })
 
 function navigateToGroup(groupId) {
     navigate(`/group/${groupId}`)
+}
+
+async function acceptInvite(inviteId) {
+    const acceptRes = await fetchPost(`/api/invite/accept/${inviteId}`)
+    if(acceptRes.status === 401) {
+        navigate('/login');
+        return;
+    }
+    window.location.reload()
+}
+
+async function declineInvite(inviteId) {
+    const declineRes = await fetchDelete(`/api/invite/decline/${inviteId}`)
+    if(declineRes.status === 401) {
+        navigate('/login');
+        return;
+    }
+    window.location.reload()
 }
 
 
@@ -59,6 +80,7 @@ function navigateToGroup(groupId) {
 </table>
 </div>
 
+{#if invites.length > 0}
 <h1 class="heading">Invites</h1>
 <div class="table-container">
     <table class="group-table">
@@ -70,19 +92,22 @@ function navigateToGroup(groupId) {
             </tr>
         </thead>
         <tbody>
+            {#each invites as invite}
             <tr>
                 <td>
-                    some@email sent you an invite to join GROUP_NAME
+                    {invite.email} sent you and invite to join {invite.group_name}
                 </td>
                 <td>
-                    <img class='table-svg' src="/tick.png" alt="x">
+                    <button on:click={() => acceptInvite(invite.invite_id)}><img class='table-svg' src="/tick.png" alt="x"></button>
                 </td>
                 <td>
-                    <img class='table-svg' src="/red-cross.png" alt="x">
+                    <button on:click={() => declineInvite(invite.invite_id)}><img class='table-svg' src="/red-cross.png" alt="x"></button>
                 </td>
             </tr>
+            {/each}
         </tbody>
     </table>
 </div>
+{/if}
 
 

@@ -1,20 +1,34 @@
 import { Router } from "express";
-import { authenticate } from "../middleware/middleware";
+import { authenticate } from "../middleware/middleware.js";
+import { getInvites, sendInvite, deleteInvite, acceptInvite } from "../db/repos/inviteRepo.js";
 
 const router = Router();
 
 router.get('/api/invite', authenticate, async (req, res) => {
-    // GET INVITES FOR USER
+    const { userId } = req.claims;
+    const invites = await getInvites(userId);
+    console.log(invites)
+    return res.send(invites);
 })
 
 router.post('/api/invite', authenticate, async (req, res) => {
+    const sentFrom = req.claims.userId;
     const { addedUserId, groupId } = req.body;
-    const post = await addMember(addedUserId, groupId)
+    console.log(sentFrom, addedUserId, groupId)
+    const post = await sendInvite(sentFrom, addedUserId, groupId)
     return res.send(post)
 })
 
-router.delete('/api/invite/decline', authenticate, async (req, res) => {
-    // DECLINE - REMOVE ROW
+router.post('/api/invite/accept/:id', authenticate, async (req, res) => {
+    const inviteId = req.params.id;
+    const accept = await acceptInvite(inviteId);
+    res.send(accept);
+})
+
+router.delete('/api/invite/decline/:id', authenticate, async (req, res) => {
+    const inviteId = req.params.id;
+    const decline = await deleteInvite(inviteId)
+    return res.send(decline)
 })
 
 
