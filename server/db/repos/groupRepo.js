@@ -42,9 +42,6 @@ export async function createGroup(user, group) {
 }
 
 
-
-
-
 export async function addMember(userId, groupId) {
     try {
         const [addMember] = await pool.query(`INSERT INTO user_group (user_id, group_id)
@@ -56,3 +53,17 @@ export async function addMember(userId, groupId) {
     }
 }
 
+
+export async function isMember(userId, groupId) {
+    try {
+        const [isMember] = await pool.query(`SELECT * FROM user_group WHERE user_id = ? AND group_id = ?`,
+                                            [userId, groupId])
+        if(!isMember[0]) {
+            return false;
+        }
+        return isMember[0]
+        
+    } catch(error) {
+        console.error(error)
+    }
+}

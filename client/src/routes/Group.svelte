@@ -15,15 +15,26 @@
     let transfers = []
   
     onMount(async () => {
+
+      
+
       const userRes = await fetchGet('/api/user');
       console.log(userRes)
       if(userRes.status === 401) {
         navigate('/login')
 
       } else {
-        
         authenticated.set(true)
         userId = userRes.data.user.id
+      }
+
+      const memberCheck = await fetchGet(`/api/group/ismember/${userId}/${groupId}`)
+      console.log(memberCheck, 'memberCheck')
+
+      if(memberCheck.data === false) {
+        navigate('/mygroups')
+        
+      } else {
         const groupRes = await fetchGet(`/api/group/${groupId}`)
         group = groupRes.data;
         const expenseRes = await fetchGet(`/api/expense/${groupId}`)
@@ -33,6 +44,7 @@
         totalExpense = getTotalExpenses(expenses)
         transfers = calculateTransfers(expenses);
       }
+
     });
 
     let expense;
@@ -110,13 +122,13 @@
             <td>{expense}</td>
             <td>{description}</td>
             {#if userId === user_id}
-            <td><button on:click={() => deleteExpense(expense_id)}><img class='cross' src="/red-cross.png" alt="x"></button></td>
+            <td><button on:click={() => deleteExpense(expense_id)}><img class='table-svg' src="/red-cross.png" alt="x"></button></td>
             {/if}
           </tr>
         {/each}
         {:else}
         <tr>
-          <td colspan="4">No expenses yet</td> <!-- Added colspan to span all columns -->
+          <td colspan="4">No expenses yet</td>
         </tr>
         {/if}
       </tbody>
@@ -127,8 +139,10 @@
 
 
   <form class="login" on:submit|preventDefault={postExpense}>
-    <input bind:value={expense} placeholder="Expense" />
-    <input bind:value={description} placeholder="Description" />
+    <label for="expense">Expense</label>
+    <input bind:value={expense} />
+    <label for="description">Description</label>
+    <input bind:value={description} />
     <button type="submit">Add expense</button>
 </form>
 
@@ -155,6 +169,8 @@
   </table>
   </div>
 
+  {:else}
+  <p class="total-expense">No expenses to be shared!</p>
   {/if}
 
 

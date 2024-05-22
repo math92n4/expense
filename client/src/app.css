@@ -41,6 +41,8 @@ body {
     border-radius: 5px;
     cursor: pointer;
     background-color: #009879;
+    color: #ffffff;
+    font-family: "Comfortaa", sans-serif;
   }
   
   .navbar {
@@ -77,7 +79,7 @@ body {
     color: red;
   }
 
-  .cross {
+  .table-svg {
     cursor: pointer;
     width: 20px;
   }

@@ -4,7 +4,8 @@
     import { navigate } from 'svelte-routing';
     import { fetchGet } from '../util/api.js';
     
-    let groups = []
+    let groups = [];
+    let invites = [];
 
     onMount(async () => {
         const userRes = await fetchGet('/api/user')
@@ -55,6 +56,32 @@ function navigateToGroup(groupId) {
         {/each}
     </tbody>
 </table>
+</div>
+
+<h1 class="heading">Invites</h1>
+<div class="table-container">
+    <table class="group-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Accept</th>
+                <th>Decline</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    some@email sent you an invite to join GROUP_NAME
+                </td>
+                <td>
+                    <img class='table-svg' src="/tick.png" alt="x">
+                </td>
+                <td>
+                    <img class='table-svg' src="/red-cross.png" alt="x">
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createGroup, getGroupsByUserId, getGroupById, addMember } from "../db/repos/groupRepo.js"
+import { createGroup, getGroupsByUserId, getGroupById, addMember, isMember } from "../db/repos/groupRepo.js"
 import { getUserByEmail } from "../db/repos/userRepo.js";
 import { authenticateToken } from "../util/jwt.js";
 
@@ -15,6 +15,13 @@ router.get('/api/group/:id', async (req, res) => {
     const groupId = req.params.id;
     const group = await getGroupById(groupId)
     return res.send(group)
+})
+
+router.get('/api/group/ismember/:userId/:groupId', async (req, res) => {
+    const userId = req.params.userId;
+    const groupId = req.params.groupId;
+    const member = await isMember(userId, groupId);
+    return res.send(member)
 })
 
 router.post('/api/group', async (req, res) => {
