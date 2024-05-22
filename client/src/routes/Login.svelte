@@ -1,5 +1,4 @@
 <script>
-
     import { fetchPost } from "../util/api";
     import { navigate } from "svelte-routing";
 

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getUserByEmail, createUser } from "../db/repos/userRepo.js";
 import { hashPassword, checkPassword } from "../util/password.js"
 import { generateAccessToken, authenticateToken } from "../util/jwt.js";
+import { authenticate } from "../middleware/middleware.js"
 
 const router = Router();
 
@@ -46,17 +47,20 @@ router.post('/api/login', async (req, res) => {
         return res.status(400).send({ message: "Bad credentials" })
     }
 
-    const token = generateAccessToken(email)
+    const userId = user.user_id
+
+    const token = generateAccessToken(email, userId)
+    console.log(token, 'token')
 
     res.cookie('jwt', token, {
         httpOnly: true,
-        maxAge: 300000
+        maxAge: 5000
     })
 
-    return res.send({ message: 'You are logged on' })
+    return res.send({ data: {email, userId } })
 })
 
-router.get('/api/user', async (req, res) => {
+router.get('/api/user', authenticate, async (req, res) => {
     try {
         const cookie = req.cookies['jwt'];
         const claims = authenticateToken(cookie)

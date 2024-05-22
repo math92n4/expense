@@ -2,23 +2,24 @@
     import { onMount } from 'svelte'
     import { authenticated } from '../stores/auth.js';
     import { navigate } from 'svelte-routing';
-    import { fetchGet } from '../util/api.js';
+    import { fetchGet } from '../util/api.js'
     
     let groups = [];
     let invites = [];
 
     onMount(async () => {
-        const userRes = await fetchGet('/api/user')
+        
+        authenticated.set(true)
+        const groupRes = await fetchGet(`/api/group/my`)
 
-        if(userRes.status === 200) {
-            const user = userRes.data.user;
-            authenticated.set(true)
-            const groupRes = await fetchGet(`/api/group/my/${user.id}`)
-            groups = groupRes.data;
-        } else {
+        if(groupRes.status === 401) {
             navigate('/login')
+            return;
         }
-    
+
+        console.log(groupRes)
+        groups = groupRes.data;
+
 })
 
 function navigateToGroup(groupId) {

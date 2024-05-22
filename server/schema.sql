@@ -29,4 +29,13 @@ CREATE TABLE expense (
   group_id INT,
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
-)
+);
+
+CREATE TABLE invites (
+	sent_from INT,
+    sent_to INT,
+    group_id INT,
+    FOREIGN KEY (sent_from) REFERENCES users(user_id),
+    FOREIGN KEY (sent_to) REFERENCES users(user_id),
+    FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
+);

@@ -1,33 +1,24 @@
 <script>
     import { onMount } from 'svelte'
     import { authenticated } from '../stores/auth.js';
-    import { fetchGet, fetchPost } from '../util/api.js';
+    import { fetchPost } from '../util/api.js';
     import { navigate } from 'svelte-routing';
 
     onMount(async () => {
-        
-        try {
-            await fetchGet('/api/user');
-            authenticated.set(true);
-        } catch(error) {
-            navigate('/login')
-        }
-        
-
+        authenticated.set(true)
     })
 
     let groupName = '';
     let groupDesc = '';
 
     async function createGroup() {
-        try {
-            fetchPost('/api/group', { groupName, groupDesc })
-            navigate('/mygroups')
-        } catch(error) {
-            console.log(error)
-        }
-
+        const postGroup = await fetchPost('/api/group', { groupName, groupDesc }) 
+        if(postGroup.status === 401) {
+            navigate('/login')
+            return;
+        }  
     }
+
 </script>
 
 

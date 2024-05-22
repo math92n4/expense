@@ -1,5 +1,7 @@
 <script>
     import { authenticated } from "../stores/auth"
+    import { navigate } from "svelte-routing";
+
     let auth = false;
     authenticated.subscribe(a => auth = a)
 
@@ -11,7 +13,7 @@
         })
 
         if(res.ok) {
-            window.location.href = '/login'
+            navigate('/login')
         }
     }
 

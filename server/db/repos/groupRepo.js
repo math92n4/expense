@@ -22,7 +22,7 @@ export async function getGroupById(id) {
     }
 }
 
-export async function createGroup(user, group) {
+export async function createGroup(userId, group) {
     try {
         const [groupResult] = await pool.query(`INSERT INTO expense_groups (group_name, description)
                                                 VALUES (?, ?)`,
@@ -32,7 +32,7 @@ export async function createGroup(user, group) {
 
         const [result] = await pool.query(`INSERT INTO user_group (user_id, group_id)
                                            VALUES (?, ?)`,
-                                           [user.id, groupId]);
+                                           [userId, groupId]);
 
         return groupResult;
     } catch (error) {

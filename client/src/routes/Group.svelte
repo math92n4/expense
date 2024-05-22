@@ -6,7 +6,6 @@
     import { fetchDelete, fetchGet, fetchPost } from '../util/api.js';
   
     export let groupId;
-    let userId;
     let group = null;
     let email
     let memberMessage = ""
@@ -16,56 +15,51 @@
   
     onMount(async () => {
 
+        const memberCheck = await fetchGet(`/api/group/ismember/${groupId}`)
+
+        if(memberCheck.status === 401) {
+          navigate('/login')
+          return;
+        }
+
+        console.log(memberCheck, 'memberCheck')
+
+        if(memberCheck.data === false) {
+          navigate('/mygroups')
+        } else {
+          authenticated.set(true);
+          const groupRes = await fetchGet(`/api/group/${groupId}`)
+          group = groupRes.data;
+          const expenseRes = await fetchGet(`/api/expense/${groupId}`)
+          console.log(expenseRes)
+          expenses = expenseRes.data
+
+          totalExpense = getTotalExpenses(expenses)
+          transfers = calculateTransfers(expenses);
+        }
+      })
+
       
-
-      const userRes = await fetchGet('/api/user');
-      console.log(userRes)
-      if(userRes.status === 401) {
-        navigate('/login')
-
-      } else {
-        authenticated.set(true)
-        userId = userRes.data.user.id
-      }
-
-      const memberCheck = await fetchGet(`/api/group/ismember/${userId}/${groupId}`)
-      console.log(memberCheck, 'memberCheck')
-
-      if(memberCheck.data === false) {
-        navigate('/mygroups')
-        
-      } else {
-        const groupRes = await fetchGet(`/api/group/${groupId}`)
-        group = groupRes.data;
-        const expenseRes = await fetchGet(`/api/expense/${groupId}`)
-        console.log(expenseRes)
-        expenses = expenseRes.data
-
-        totalExpense = getTotalExpenses(expenses)
-        transfers = calculateTransfers(expenses);
-      }
-
-    });
 
     let expense;
     let description;
 
     async function postExpense() {
-      const postExpense = await fetchPost('/api/expense', { expense, description, userId, groupId });
+      const postExpense = await fetchPost('/api/expense', { expense, description, groupId });
       if(postExpense.status === 201) {
         window.location.reload();
       }
     }
 
     async function addMember() {
-      const userRes = await fetchGet(`/api/user/${email}`)
+      const userRes = await fetchGet(`/api/user/`)
       console.log(userRes)
 
       if(userRes.status === 200) {
         const user = userRes.data.data;
-        const userId = user.user_id;
+        const addedUserId = user.user_id;
 
-        const postMember = await fetchPost("/api/member", { userId, groupId })
+        const postMember = await fetchPost("/api/member", { addedUserId, groupId })
 
         if(postMember.status === 200) {
           memberMessage = `${email} has been invited`
@@ -121,7 +115,7 @@
             <td>{email}</td>
             <td>{expense}</td>
             <td>{description}</td>
-            {#if userId === user_id}
+            {#if user_id === user_id}
             <td><button on:click={() => deleteExpense(expense_id)}><img class='table-svg' src="/red-cross.png" alt="x"></button></td>
             {/if}
           </tr>
