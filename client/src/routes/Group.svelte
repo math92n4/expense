@@ -3,7 +3,7 @@
     import { authenticated } from '../stores/auth.js';
     import { getTotalExpenses, calculateTransfers } from '../util/expenses.js';
     import { navigate } from 'svelte-routing';
-    import { fetchDelete, fetchGet, fetchPost } from '../util/api.js';
+    import { fetchDelete, fetchGet, fetchPost, fetchPut } from '../util/api.js';
   
     export let groupId;
     let group = null;
@@ -92,6 +92,30 @@
       }
     }
 
+    let updatedExpense;
+    let updatedDescription;
+    let expenseIdToUpdate;
+
+    function openUpdate(expenseId) {
+    const expenseToUpdate = expenses.find(expense => expense.expense_id === expenseId);
+    if (expenseToUpdate) {
+      updatedExpense = expenseToUpdate.expense;
+      updatedDescription = expenseToUpdate.description;
+      expenseIdToUpdate = expenseId;
+      const modal = document.getElementById('updateExpense');
+      modal.style.display = 'block';
+    }
+  }
+
+  async function updateExpense() {
+    const updateExpense = await fetchPut('/api/expense', { updatedExpense, updatedDescription, expenseIdToUpdate })
+    if(updateExpense.status === 401) {
+      navigate('/login');
+    } else {
+      window.location.reload();
+    }
+  }
+
   </script>
   
   {#if group}
@@ -120,6 +144,7 @@
           <th>Expense</th>
           <th>Description</th>
           <th></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -131,6 +156,7 @@
             <td>{description}</td>
             {#if user_id === user_id}
             <td><button on:click={() => deleteExpense(expense_id)}><img class='table-svg' src="/red-cross.png" alt="x"></button></td>
+            <td><button on:click={() => openUpdate(expense_id)}><img class='table-svg' src="/update.png" alt="%"></button></td>
             {/if}
           </tr>
         {/each}
@@ -142,6 +168,14 @@
       </tbody>
     </table>
   </div>
+
+  <form class="login" style="display: none;" id="updateExpense" on:submit|preventDefault={updateExpense}>
+    <label for="expense">Update expense</label>
+    <input bind:value={updatedExpense} />
+    <label for="description">Update escription</label>
+    <input bind:value={updatedDescription} />
+    <button type="submit">Update expense</button>
+  </form>
 
   <p class='total-expense'>Total expense: {totalExpense}</p>
 

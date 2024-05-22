@@ -42,7 +42,30 @@ export async function fetchPost(path, body) {
         }
 
     } catch(error) {
-        throw new Error(error.message)
+        throw new Error(error.message);
+    }
+}
+
+export async function fetchPut(path, body) {
+    try {
+        const res = await fetch(`${apiUrl}${path}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+            credentials: 'include'
+        })
+
+        const resData = await res.json();
+
+        return {
+            status: res.status,
+            data: resData
+        }
+
+    } catch(error) {
+        throw new Error(error.message);
     }
 }
 
