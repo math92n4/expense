@@ -24,9 +24,9 @@ export async function getGroupById(id) {
 
 export async function createGroup(userId, group) {
     try {
-        const [groupResult] = await pool.query(`INSERT INTO expense_groups (group_name, description)
-                                                VALUES (?, ?)`,
-                                                [group.groupName, group.groupDesc]);
+        const [groupResult] = await pool.query(`INSERT INTO expense_groups (group_owner, group_name, description)
+                                                VALUES (?, ?, ?)`,
+                                                [userId, group.groupName, group.groupDesc]);
 
         const groupId = groupResult.insertId;
 
@@ -65,5 +65,15 @@ export async function isMember(userId, groupId) {
         
     } catch(error) {
         console.error(error)
+    }
+}
+
+export async function deleteGroup(id) {
+    try {
+        const [deletedGroup] = await pool.query('DELETE FROM expense_groups WHERE group_id = ?',
+                                                [id])
+        return deletedGroup;
+    } catch(error) {
+        console.error(error);
     }
 }

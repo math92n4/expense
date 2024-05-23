@@ -10,15 +10,17 @@ CREATE TABLE users (
 
 CREATE TABLE expense_groups (
   group_id INT AUTO_INCREMENT PRIMARY KEY,
+  group_owner INT,
   group_name VARCHAR(255),
-  description TEXT
+  description TEXT,
+  FOREIGN KEY (group_owner) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE user_group (
   user_id INT,
   group_id INT,
-  FOREIGN KEY (user_id) REFERENCES users(user_id),
-  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id) ON DELETE CASCADE
 );
 
 CREATE TABLE expense (
@@ -27,8 +29,8 @@ CREATE TABLE expense (
   description TEXT,
   user_id INT,
   group_id INT,
-  FOREIGN KEY (user_id) REFERENCES users(user_id),
-  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id) ON DELETE CASCADE
 );
 
 CREATE TABLE invites (
@@ -36,7 +38,7 @@ CREATE TABLE invites (
 	sent_from INT,
   sent_to INT,
   group_id INT,
-  FOREIGN KEY (sent_from) REFERENCES users(user_id),
-  FOREIGN KEY (sent_to) REFERENCES users(user_id),
-  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id)
+  FOREIGN KEY (sent_from) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (sent_to) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (group_id) REFERENCES expense_groups(group_id) ON DELETE CASCADE
 );

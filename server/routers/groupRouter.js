@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createGroup, getGroupsByUserId, getGroupById, addMember, isMember } from "../db/repos/groupRepo.js"
+import { createGroup, getGroupsByUserId, getGroupById, addMember, isMember, deleteGroup } from "../db/repos/groupRepo.js"
 import { authenticate } from "../middleware/middleware.js";
 
 const router = Router();
@@ -7,6 +7,11 @@ const router = Router();
 router.get('/api/group/my', authenticate, async (req, res) => {
     const { userId } = req.claims;
     const groups = await getGroupsByUserId(userId);
+    groups.forEach(group => {
+        if(group.group_owner === userId) {
+            group.owner = true;
+        }
+    })
     return res.send(groups)
 })
 
@@ -40,8 +45,12 @@ router.post('/api/group', authenticate, async (req, res) => {
     }
     const createdGroup = await createGroup(userId, group)
     return res.status(201).send(createdGroup)
+})
 
-    
+router.delete('/api/group/:id', authenticate, async (req, res) => {
+    const groupId = req.params.id;
+    const deletedGroup = await deleteGroup(groupId);
+    return res.send(deletedGroup);
 })
 
 

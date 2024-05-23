@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUserByEmail, createUser, updateUser } from "../db/repos/userRepo.js";
+import { getUserByEmail, createUser, updateUser, deleteUser } from "../db/repos/userRepo.js";
 import { hashPassword, checkPassword } from "../util/password.js"
 import { generateAccessToken, authenticateToken } from "../util/jwt.js";
 import { authenticate } from "../middleware/middleware.js"
@@ -71,10 +71,17 @@ router.post('/api/login', async (req, res) => {
 
     res.cookie('jwt', token, {
         httpOnly: true,
-        maxAge: 500000
+        maxAge: 5000000000
     })
 
     return res.send({ email, userId })
+})
+
+router.delete('/api/user', authenticate, async (req, res) => {
+    const { userId } = req.claims;
+    const deletedUser = await deleteUser(userId);
+    console.log(deletedUser);
+    return res.send(deletedUser)
 })
 
 router.put('/api/user', authenticate, async (req, res) => {

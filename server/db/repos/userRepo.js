@@ -12,6 +12,13 @@ export async function createUser(email, password) {
     return getUserByEmail(email)
 }
 
+export async function deleteUser(id) {
+    const [result] = await pool.query('DELETE FROM users WHERE user_id = ?',
+                                    [id])
+
+    return result;
+}
+
 export async function updateUser(id, email, password) {
     const [result] = await pool.query('UPDATE users SET email = ?, password = ? WHERE user_id = ?',
                                         [email, password, id]);

@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { fetchGet, fetchPut } from "../util/api";
+    import { fetchGet, fetchPut, fetchDelete } from "../util/api";
     import { navigate } from "svelte-routing";
     import { authenticated } from "../stores/auth";
 
@@ -31,7 +31,13 @@
         }
     }
 
+    async function deleteAccount() {
+        const deleteUserRes = await fetchDelete('/api/user');
+        navigate('/')
+    }
+
 </script>
+
 
 <form class="login" on:submit|preventDefault={updateUser}>
     <h1>Update Account</h1>
@@ -46,4 +52,5 @@
     {/if}
     <button type="submit">Update Account</button>
 </form>
+<button style="background-color: red;" on:click={deleteAccount}>Delete Account</button>
 

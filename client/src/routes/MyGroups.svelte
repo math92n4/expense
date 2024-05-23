@@ -47,6 +47,12 @@ async function declineInvite(inviteId) {
     window.location.reload()
 }
 
+async function deleteGroup(groupId) {
+    console.log(groupId)
+    const deleteRes = await fetchDelete(`/api/group/${groupId}`)
+    window.location.reload();
+}
+
 
 </script>
 
@@ -58,6 +64,7 @@ async function declineInvite(inviteId) {
         <tr>
             <th>Group Name</th>
             <th>Description</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -70,6 +77,9 @@ async function declineInvite(inviteId) {
                   </td>
 
                 <td>{group.description}</td>
+                {#if group.owner}
+                <td><button on:click={() => deleteGroup(group.group_id)}><img class='table-svg' src="/red-cross.png" alt="x"></button></td>
+                {/if}
             </tr>
         {:else}
             <tr>
