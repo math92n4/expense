@@ -18,7 +18,7 @@
         if(login.status === 200) {
             navigate('/mygroups')
         } else {
-            errorMessage = login.data.message
+            errorMessage = login.data
         }
     }
 

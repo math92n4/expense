@@ -12,52 +12,52 @@ router.get('/api/user/:email', async (req, res) => {
     if(!result) {
         return res.status(404).send({ data: "Could not find user" })
     }
-    res.send({ data: result })
+    res.send(result)
 })
 
 router.post('/api/user', async (req, res) => {
     const { email, password } = req.body;
     
     if(!email) {
-        return res.status(400).send({ data: "Email is missing" })
+        return res.status(400).send("Email is missing")
     }
 
     if(!password) {
-        return res.status(400).send({ data: "Password is missing" })
+        return res.status(400).send("Password is missing")
     }
 
     if(await getUserByEmail(email)) {
-        return res.status(409).send({ data: "Email already exist" })
+        return res.status(409).send("Email already exist")
     }
 
     const encryptedPassword = await hashPassword(password)
     const result = await createUser(email, encryptedPassword)
-    res.status(201).send({ data: result.id })
+    res.status(201).send(result.id)
 })
 
 router.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await getUserByEmail(email)
     if(!user) {
-        return res.status(404).send({ message: "User not found" })
+        return res.status(404).send("User not found")
     } 
 
     const passwordCheck = await checkPassword(password, user.password)
     if(!passwordCheck) {
-        return res.status(400).send({ message: "Bad credentials" })
+        return res.status(400).send("Bad credentials")
     }
 
     const userId = user.user_id
 
     const token = generateAccessToken(email, userId)
-    console.log(token, 'token')
+
 
     res.cookie('jwt', token, {
         httpOnly: true,
         maxAge: 500000
     })
 
-    return res.send({ data: {email, userId } })
+    return res.send({ email, userId })
 })
 
 router.get('/api/user', authenticate, async (req, res) => {
@@ -65,7 +65,7 @@ router.get('/api/user', authenticate, async (req, res) => {
         const cookie = req.cookies['jwt'];
         const claims = authenticateToken(cookie)
         if(!claims) {
-            return res.status(401).send({ message: "Unauthenticated" })
+            return res.status(401).send("Unauthenticated")
         }
 
         const { user_id, email } = await getUserByEmail(claims)
@@ -75,17 +75,17 @@ router.get('/api/user', authenticate, async (req, res) => {
             email: email
         }
 
-        return res.status(200).send({ user })
+        return res.status(200).send(user)
          
     } catch(e) {
-        return res.status(401).send({ message: "Unauthenticated" })
+        return res.status(401).send("Unauthenticated")
     }
     
 })
 
 router.post('/api/logout', (req, res) => {
     res.cookie('jwt', '', { maxAge: 0 })
-    res.send({ message: 'Logged out' })
+    res.send('Logged out')
 })
 
 export default router;

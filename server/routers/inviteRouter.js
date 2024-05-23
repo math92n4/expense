@@ -22,7 +22,7 @@ router.post('/api/invite', authenticate, async (req, res) => {
 router.post('/api/invite/accept/:id', authenticate, async (req, res) => {
     const inviteId = req.params.id;
     const accept = await acceptInvite(inviteId);
-    res.send(accept);
+    return res.send(accept);
 })
 
 router.delete('/api/invite/decline/:id', authenticate, async (req, res) => {

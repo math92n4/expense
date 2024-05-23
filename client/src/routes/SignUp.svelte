@@ -19,7 +19,7 @@
             const login = await fetchPost('/api/login', { email, password })
 
             if(login.status === 200) {
-                const { userId } = login.data.data
+                const { userId } = login.data
                 navigate('/mygroups')
             }
             
