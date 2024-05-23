@@ -17,7 +17,7 @@
         const memberCheck = await fetchGet(`/api/group/ismember/${groupId}`)
 
         if(memberCheck.status === 401) {
-          navigate('/login')
+          navigate('/')
           return;
         }
 
@@ -67,7 +67,7 @@
     async function postExpense() {
       const postExpense = await fetchPost('/api/expense', { expense, description, groupId });
       if(postExpense.status === 401) {
-        navigate('/login')
+        navigate('/')
       } else {
         window.location.reload();
       }
@@ -82,7 +82,7 @@
       console.log(existingMember)
 
       if(existingMember.status === 401) {
-        navigate('/login')
+        navigate('/')
         return;
       }
 
@@ -100,7 +100,7 @@
         
         const sendInvite = await fetchPost('/api/invite', { addedUserId, groupId })
         if(sendInvite.status === 401) {
-          navigate('/login')
+          navigate('/')
           return;
         }
         memberMessage = `An invite has been sent to ${addedEmail}`
@@ -148,7 +148,7 @@
   async function updateExpense() {
     const updateExpense = await fetchPut('/api/expense', { updatedExpense, updatedDescription, expenseIdToUpdate })
     if(updateExpense.status === 401) {
-      navigate('/login');
+      navigate('/');
     } else {
       window.location.reload();
     }

@@ -14,7 +14,7 @@
     async function createGroup() {
         const postGroup = await fetchPost('/api/group', { groupName, groupDesc }) 
         if(postGroup.status === 401) {
-            navigate('/login')
+            navigate('/')
             return;
         } else {
             navigate('/mygroups')

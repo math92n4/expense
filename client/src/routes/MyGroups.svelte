@@ -13,7 +13,7 @@
         const groupRes = await fetchGet(`/api/group/my`)
 
         if(groupRes.status === 401) {
-            navigate('/login')
+            navigate('/')
             return;
         }
 
@@ -32,7 +32,7 @@ function navigateToGroup(groupId) {
 async function acceptInvite(inviteId) {
     const acceptRes = await fetchPost(`/api/invite/accept/${inviteId}`)
     if(acceptRes.status === 401) {
-        navigate('/login');
+        navigate('/');
         return;
     }
     window.location.reload()
@@ -41,7 +41,7 @@ async function acceptInvite(inviteId) {
 async function declineInvite(inviteId) {
     const declineRes = await fetchDelete(`/api/invite/decline/${inviteId}`)
     if(declineRes.status === 401) {
-        navigate('/login');
+        navigate('/');
         return;
     }
     window.location.reload()
