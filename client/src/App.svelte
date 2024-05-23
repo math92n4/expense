@@ -6,7 +6,7 @@
   import MyGroups from './routes/MyGroups.svelte'
   import Group from './routes/Group.svelte';
   import Nav from './components/Nav.svelte'
-  
+  import Profile from './routes/Profile.svelte';
 </script>
 
 <Nav />
@@ -17,4 +17,5 @@
   <Route path="/group" component={CreateGroup} />
   <Route path="/mygroups" component={MyGroups} />
   <Route path="/group/:groupId" component={Group} />
+  <Route path="/profile" component={Profile} />
 </Router>

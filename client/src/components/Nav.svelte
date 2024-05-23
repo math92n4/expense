@@ -18,6 +18,7 @@
     <ul class="navbar-links">
         <li><a href="/group">Create group</a></li>
         <li><a href="/mygroups">My groups</a></li>
+        <li><a href="/profile">Profile</a></li>
         <li><a href="/" on:click={ logOut }>Logout</a></li>
     </ul>
 </nav>

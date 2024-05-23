@@ -87,10 +87,11 @@
       }
 
       if(existingMember.status === 404) {
-        memberMessage = existingMember.data.data;
+        memberMessage = existingMember.data;
         return;
+        
       } else {
-        addedUserId = existingMember.data.data.user_id;
+        addedUserId = existingMember.data.user_id;
       }
 
       const isMember = await fetchGet(`/api/group/ismember/${addedUserId}/${groupId}`)

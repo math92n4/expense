@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUserByEmail, createUser } from "../db/repos/userRepo.js";
+import { getUserByEmail, createUser, updateUser } from "../db/repos/userRepo.js";
 import { hashPassword, checkPassword } from "../util/password.js"
 import { generateAccessToken, authenticateToken } from "../util/jwt.js";
 import { authenticate } from "../middleware/middleware.js"
@@ -10,41 +10,58 @@ router.get('/api/user/:email', async (req, res) => {
     const email = req.params.email;
     const result = await getUserByEmail(email);
     if(!result) {
-        return res.status(404).send({ data: "Could not find user" })
+        return res.status(404).send({ message: "Could not find user" })
     }
     res.send(result)
+})
+
+router.get('/api/user', authenticate, async (req, res) => {
+    const claims = req.claims;
+    if(!claims) {
+        return res.status(401).send({ message: 'Unauthenticated'})
+    }
+    const user = await getUserByEmail(claims.email);
+    console.log(user)
+    return res.send(user);
+})
+
+
+router.post('/api/logout', (req, res) => {
+    res.cookie('jwt', '', { maxAge: 0 })
+    res.send('Logged out')
 })
 
 router.post('/api/user', async (req, res) => {
     const { email, password } = req.body;
     
     if(!email) {
-        return res.status(400).send("Email is missing")
+        return res.status(400).send({ message: "Email is missing" })
     }
 
     if(!password) {
-        return res.status(400).send("Password is missing")
+        return res.status(400).send({ message: "Password is missing" })
     }
 
     if(await getUserByEmail(email)) {
-        return res.status(409).send("Email already exist")
+        return res.status(409).send({ message: "Email already exist" })
     }
 
     const encryptedPassword = await hashPassword(password)
     const result = await createUser(email, encryptedPassword)
-    res.status(201).send(result.id)
+
+    res.status(201).send({ message: 'User created' })
 })
 
 router.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await getUserByEmail(email)
     if(!user) {
-        return res.status(404).send("User not found")
+        return res.status(404).send({ message: "User not found" })
     } 
 
     const passwordCheck = await checkPassword(password, user.password)
     if(!passwordCheck) {
-        return res.status(400).send("Bad credentials")
+        return res.status(400).send({ message: "Bad credentials" })
     }
 
     const userId = user.user_id
@@ -60,32 +77,20 @@ router.post('/api/login', async (req, res) => {
     return res.send({ email, userId })
 })
 
-router.get('/api/user', authenticate, async (req, res) => {
-    try {
-        const cookie = req.cookies['jwt'];
-        const claims = authenticateToken(cookie)
-        if(!claims) {
-            return res.status(401).send("Unauthenticated")
-        }
+router.put('/api/user', authenticate, async (req, res) => {
+    const { userId, email } = req.claims;
+    const currentUser = await getUserByEmail(email); 
+    const { newEmail, oldPassword, newPassword } = req.body;
 
-        const { user_id, email } = await getUserByEmail(claims)
+    const passwordMatch = await checkPassword(oldPassword, currentUser.password);
 
-        const user = {
-            id: user_id,
-            email: email
-        }
-
-        return res.status(200).send(user)
-         
-    } catch(e) {
-        return res.status(401).send("Unauthenticated")
+    if(!passwordMatch) {
+        return res.status(403).send({ message: 'Old password doesnt match' })
     }
-    
-})
 
-router.post('/api/logout', (req, res) => {
-    res.cookie('jwt', '', { maxAge: 0 })
-    res.send('Logged out')
+    const encryptedPassword = await hashPassword(newPassword)
+    const updatedUser = await updateUser(userId, newEmail, encryptedPassword);
+    return res.status(201).send({ message: 'User has been updated' });
 })
 
 export default router;

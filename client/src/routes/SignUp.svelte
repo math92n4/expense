@@ -9,19 +9,18 @@
 
     async function signUp() {
         const post = await fetchPost('/api/user', { email, password })
-
+        console.log(post)
         if(post.status === 400) {
-            errorMessage = 'Password or email is missing';
+            errorMessage = post.data.message
         } else if(post.status === 409) {
-            errorMessage = 'Email already exist';
+            errorMessage = post.data.message
         } else if(post.status === 201) {
 
-            const login = await fetchPost('/api/login', { email, password })
+        const login = await fetchPost('/api/login', { email, password })
 
-            if(login.status === 200) {
-                const { userId } = login.data
-                navigate('/mygroups')
-            }
+        if(login.status === 200) {
+            navigate('/mygroups')
+        }
             
         }      
     }
