@@ -5,8 +5,14 @@ import { authenticate } from "../middleware/middleware.js";
 const router = Router();
 
 router.get('/api/expense/:groupId', authenticate, async (req, res) => {
+    const { userId } = req.claims;
     const groupId = req.params.groupId;
     const expenses = await getUsersAndExpensesByGroupId(groupId);
+    expenses.forEach(expense => {
+        if(expense.user_id === userId) {
+            expense.currentUser = true
+        }
+    })
     return res.send(expenses)
 })
 

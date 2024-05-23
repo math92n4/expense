@@ -21,8 +21,6 @@
           return;
         }
 
-        console.log(memberCheck, 'memberCheck')
-
         if(memberCheck.data === false) {
           navigate('/mygroups')
         } else {
@@ -36,6 +34,29 @@
           totalExpense = getTotalExpenses(expenses)
           transfers = calculateTransfers(expenses);
         }
+
+        const memberModal = document.getElementById('member-modal');
+        const closeMemberButton = document.getElementById('close-button-member');
+
+        closeMemberButton.addEventListener('click', () => {
+          memberModal.style.display = 'none';
+        });
+
+
+        const postModal = document.getElementById('post-modal');
+        const closePostButton = document.getElementById('close-button-post');
+
+        closePostButton.addEventListener('click', () => {
+          postModal.style.display = 'none';
+        });
+
+        const modal = document.getElementById('update-modal');
+        const closeButton = document.getElementById('close-button-update');
+
+        closeButton.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+
       })
 
       
@@ -45,7 +66,9 @@
 
     async function postExpense() {
       const postExpense = await fetchPost('/api/expense', { expense, description, groupId });
-      if(postExpense.status === 201) {
+      if(postExpense.status === 401) {
+        navigate('/login')
+      } else {
         window.location.reload();
       }
     }
@@ -65,12 +88,16 @@
 
       if(existingMember.status === 404) {
         memberMessage = existingMember.data.data;
+        return;
       } else {
         addedUserId = existingMember.data.data.user_id;
       }
 
       const isMember = await fetchGet(`/api/group/ismember/${addedUserId}/${groupId}`)
+      console.log(isMember)
+      
       if(isMember.data === false) {
+        
         const sendInvite = await fetchPost('/api/invite', { addedUserId, groupId })
         if(sendInvite.status === 401) {
           navigate('/login')
@@ -81,7 +108,6 @@
       } else {
         memberMessage = 'User is already part of the group'
       }
-
     }
 
     async function deleteExpense(expenseId) {
@@ -96,16 +122,28 @@
     let updatedDescription;
     let expenseIdToUpdate;
 
-    function openUpdate(expenseId) {
+  function openUpdate(expenseId) {
     const expenseToUpdate = expenses.find(expense => expense.expense_id === expenseId);
     if (expenseToUpdate) {
       updatedExpense = expenseToUpdate.expense;
       updatedDescription = expenseToUpdate.description;
       expenseIdToUpdate = expenseId;
-      const modal = document.getElementById('updateExpense');
+      const modal = document.getElementById('update-modal');
       modal.style.display = 'block';
     }
   }
+
+  function openMemberModal() {
+    const memberModal = document.getElementById('member-modal');
+    memberModal.style.display = 'block'
+  }
+
+  function openExpenseModal() {
+    const postModal = document.getElementById('post-modal');
+    postModal.style.display = 'block'
+  }
+
+
 
   async function updateExpense() {
     const updateExpense = await fetchPut('/api/expense', { updatedExpense, updatedDescription, expenseIdToUpdate })
@@ -124,16 +162,25 @@
   {:else}
     <p>Loading...</p>
   {/if}
-  
-  <form class="login" on:submit|preventDefault={addMember}>
-    <label for="email">Email</label>
-    <input bind:value={addedEmail} />
-    <button type="submit">Add member</button>
-    {#if memberMessage}
-    <p class='error'>{memberMessage}</p>
-    {/if}
-  </form>
 
+  <div class="group-buttons">
+    <button on:click={openExpenseModal}>Add expense</button>
+    <button on:click={openMemberModal}>Add member</button>
+  </div>
+  
+  <div class="modal" id="member-modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-button-member">&times;</span>
+      <form class="login" on:submit|preventDefault={addMember}>
+        <label for="email">Email</label>
+        <input bind:value={addedEmail} />
+        <button type="submit">Add member</button>
+        {#if memberMessage}
+        <p class='error'>{memberMessage}</p>
+        {/if}
+      </form>
+    </div>
+  </div>
   
 
   <div class="table-container">
@@ -149,12 +196,12 @@
       </thead>
       <tbody>
         {#if expenses.length > 0}
-        {#each expenses as { user_id, email, expense, expense_id, description }}
+        {#each expenses as { currentUser, email, expense, expense_id, description }}
           <tr>
             <td>{email}</td>
             <td>{expense}</td>
             <td>{description}</td>
-            {#if user_id === user_id}
+            {#if currentUser}
             <td><button on:click={() => deleteExpense(expense_id)}><img class='table-svg' src="/red-cross.png" alt="x"></button></td>
             <td><button on:click={() => openUpdate(expense_id)}><img class='table-svg' src="/update.png" alt="%"></button></td>
             {/if}
@@ -169,24 +216,34 @@
     </table>
   </div>
 
-  <form class="login" style="display: none;" id="updateExpense" on:submit|preventDefault={updateExpense}>
-    <label for="expense">Update expense</label>
-    <input bind:value={updatedExpense} />
-    <label for="description">Update escription</label>
-    <input bind:value={updatedDescription} />
-    <button type="submit">Update expense</button>
-  </form>
+  <div class="modal" id="update-modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-button-update">&times;</span>
+      <form class="login" on:submit|preventDefault={updateExpense}>
+        <label for="expense">Update expense</label>
+        <input bind:value={updatedExpense} />
+        <label for="description">Update description</label>
+        <input bind:value={updatedDescription} />
+        <button type="submit">Update expense</button>
+      </form>
+    </div>
+  </div>
 
   <p class='total-expense'>Total expense: {totalExpense}</p>
 
-
-  <form class="login" on:submit|preventDefault={postExpense}>
-    <label for="expense">Expense</label>
-    <input bind:value={expense} />
-    <label for="description">Description</label>
-    <input bind:value={description} />
-    <button type="submit">Add expense</button>
-</form>
+  <div class="modal" id="post-modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-button-post">&times;</span>
+      <form class="login" on:submit|preventDefault={postExpense}>
+        <label for="expense">Expense</label>
+        <input bind:value={expense} />
+        <label for="description">Description</label>
+        <input bind:value={description} />
+        <button type="submit">Add expense</button>
+      </form>
+    </div>
+  </div>
+  
 
   {#if transfers.length > 0}
 
