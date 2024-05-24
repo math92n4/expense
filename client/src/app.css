@@ -79,6 +79,10 @@ body {
     color: red;
   }
 
+  .succes {
+    color: #009879
+  }
+
   .table-svg {
     cursor: pointer;
     width: 20px;
@@ -151,8 +155,6 @@ body {
   justify-content: center;
 }
 
-
-
 .modal {
   display: none;
   position: fixed;
@@ -189,6 +191,22 @@ body {
 .close-button:focus {
   color: #009879;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.delete-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-button {
+  background-color: red;
+  color: #ffffff;
+  font-family: "Comfortaa", sans-serif;
+  width: 300px;
+  height: 40px;
+  border-radius: 5px;
   cursor: pointer;
 }
 

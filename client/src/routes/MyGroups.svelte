@@ -16,8 +16,6 @@
             navigate('/')
             return;
         }
-
-        console.log(groupRes)
         groups = groupRes.data;
 
         const inviteRes = await fetchGet('/api/invite')
@@ -48,7 +46,6 @@ async function declineInvite(inviteId) {
 }
 
 async function deleteGroup(groupId) {
-    console.log(groupId)
     const deleteRes = await fetchDelete(`/api/group/${groupId}`)
     window.location.reload();
 }

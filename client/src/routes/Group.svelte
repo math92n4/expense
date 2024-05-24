@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { authenticated } from '../stores/auth.js';
-    import { getTotalExpenses, calculateTransfers } from '../util/expenses.js';
+    import { getTotalExpenses, calculateTransfers } from '../expenses/expenses.js';
     import { navigate } from 'svelte-routing';
     import { fetchDelete, fetchGet, fetchPost, fetchPut } from '../util/api.js';
   
@@ -11,6 +11,7 @@
     let expenses = [];
     let totalExpense;
     let transfers = []
+    let userResStatus
   
     onMount(async () => {
 
@@ -28,7 +29,6 @@
           const groupRes = await fetchGet(`/api/group/${groupId}`)
           group = groupRes.data;
           const expenseRes = await fetchGet(`/api/expense/${groupId}`)
-          console.log(expenseRes)
           expenses = expenseRes.data
 
           totalExpense = getTotalExpenses(expenses)
@@ -79,7 +79,6 @@
     async function addMember() {
       let addedUserId;
       const existingMember = await fetchGet(`/api/user/${addedEmail}`)
-      console.log(existingMember)
 
       if(existingMember.status === 401) {
         navigate('/')
@@ -87,7 +86,7 @@
       }
 
       if(existingMember.status === 404) {
-        memberMessage = existingMember.data;
+        memberMessage = existingMember.data.message;
         return;
         
       } else {
@@ -95,24 +94,22 @@
       }
 
       const isMember = await fetchGet(`/api/group/ismember/${addedUserId}/${groupId}`)
-      console.log(isMember)
       
       if(isMember.data === false) {
         
         const sendInvite = await fetchPost('/api/invite', { addedUserId, groupId })
+        userResStatus = sendInvite.status;
         if(sendInvite.status === 401) {
           navigate('/')
           return;
         }
         memberMessage = `An invite has been sent to ${addedEmail}`
-        console.log(sendInvite)
       } else {
         memberMessage = 'User is already part of the group'
       }
     }
 
     async function deleteExpense(expenseId) {
-      console.log(expenseId)
       const deleteExpenseRes = await fetchDelete(`/api/expense/${expenseId}`)
       if(deleteExpenseRes.status === 200) {
         window.location.reload();
@@ -177,7 +174,11 @@
         <input bind:value={addedEmail} />
         <button type="submit">Add member</button>
         {#if memberMessage}
-        <p class='error'>{memberMessage}</p>
+          {#if userResStatus === 200}
+            <p class="succes">{memberMessage}</p>
+          {:else}
+            <p class='error'>{memberMessage}</p>
+          {/if}
         {/if}
       </form>
     </div>

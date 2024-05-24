@@ -9,11 +9,12 @@
     let newPassword;
     let message;
 
+    let resStatus;
+
 
     onMount(async () => {
         authenticated.set(true)
         const userRes = await fetchGet('/api/user')
-        console.log(userRes)
         
         if(userRes.status === 401) {
             navigate('/');
@@ -27,6 +28,7 @@
         if(updateUserRes.status === 401) {
             navigate('/')
         } else {
+            resStatus = updateUserRes.status;
             message = updateUserRes.data.message;
         }
     }
@@ -48,9 +50,17 @@
     <label for="password">New password</label>
     <input type="password" bind:value={newPassword}/>
     {#if message}
+        {#if resStatus = 200}
+            <p class="succes">{message}</p>
+        {:else}
     <p class="error">{message}</p>
+        {/if}
     {/if}
     <button type="submit">Update Account</button>
 </form>
-<button style="background-color: red;" on:click={deleteAccount}>Delete Account</button>
+
+<div class="delete-button-container">
+    <button class="delete-button" on:click={deleteAccount}>Delete Account</button>
+</div>
+
 

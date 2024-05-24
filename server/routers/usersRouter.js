@@ -54,6 +54,15 @@ router.post('/api/user', async (req, res) => {
 
 router.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
+
+    if(!email) {
+        return res.status(400).send({ message: "Email is missing" })
+    }
+
+    if(!password) {
+        return res.status(400).send({ message: "Password is missing" })
+    }
+
     const user = await getUserByEmail(email)
     if(!user) {
         return res.status(404).send({ message: "User not found" })
@@ -97,6 +106,16 @@ router.put('/api/user', authenticate, async (req, res) => {
 
     const encryptedPassword = await hashPassword(newPassword)
     const updatedUser = await updateUser(userId, newEmail, encryptedPassword);
+
+    if(updatedUser) {
+        const token = generateAccessToken(newEmail, userId)
+        res.cookie('jwt', '', { maxAge: 0 })
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            maxAge: 5000000000
+        })
+    }
+
     return res.status(201).send({ message: 'User has been updated' });
 })
 

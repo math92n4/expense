@@ -9,7 +9,6 @@
 
     async function signUp() {
         const post = await fetchPost('/api/user', { email, password })
-        console.log(post)
         if(post.status === 400) {
             errorMessage = post.data.message
         } else if(post.status === 409) {

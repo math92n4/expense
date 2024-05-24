@@ -1,6 +1,5 @@
 
 export function getTotalExpenses(expenses) {
-    console.log(expenses)
     let total = 0;
     for(let i=0; i<expenses.length; i++) {
         total += parseFloat(expenses[i].expense)
@@ -50,7 +49,6 @@ function getUsersWithAmountUnder(expenses) {
     let users = []
     const totalAllUsers = getTotalExpensesForUsers(expenses);
     const amountToBeShared = getAmountToBeShared(expenses);
-    console.log(amountToBeShared);
     totalAllUsers.forEach(user => {
         if(user.totalExpense < amountToBeShared) {
             users.push(user)
@@ -63,7 +61,6 @@ function getUsersWithAmountOver(expenses) {
     let users = []
     const totalAllUsers = getTotalExpensesForUsers(expenses);
     const amountToBeShared = getAmountToBeShared(expenses);
-    console.log(amountToBeShared);
     totalAllUsers.forEach(user => {
         if(user.totalExpense > amountToBeShared) {
             users.push(user)
