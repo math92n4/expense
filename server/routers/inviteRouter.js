@@ -7,14 +7,12 @@ const router = Router();
 router.get('/api/invite', authenticate, async (req, res) => {
     const { userId } = req.claims;
     const invites = await getInvites(userId);
-    console.log(invites)
     return res.send(invites);
 })
 
 router.post('/api/invite', authenticate, async (req, res) => {
     const sentFrom = req.claims.userId;
     const { addedUserId, groupId } = req.body;
-    console.log(sentFrom, addedUserId, groupId)
     const post = await sendInvite(sentFrom, addedUserId, groupId)
     return res.send(post)
 })

@@ -14,7 +14,6 @@ export async function getGroupsByUserId(id) {
 export async function getGroupById(id) {
     try {
         const [groupResult] = await pool.query(`SELECT * FROM expense_groups WHERE group_id = ?`, [id])
-        console.log(groupResult)
         return groupResult[0]
     } catch(error) {
         console.error(error);

@@ -40,7 +40,6 @@ export async function getUsersAndExpensesByGroupId(id) {
 }
 
 export async function updateExpense(expense, description, expenseId) {
-    console.log(expense)
     try {
         const [updatedExpense] = await pool.query('UPDATE expense SET expense = ?, description = ? WHERE expense_id = ?',
                                         [expense, description, expenseId])

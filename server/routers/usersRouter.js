@@ -21,7 +21,6 @@ router.get('/api/user', authenticate, async (req, res) => {
         return res.status(401).send({ message: 'Unauthenticated'})
     }
     const user = await getUserByEmail(claims.email);
-    console.log(user)
     return res.send(user);
 })
 
@@ -89,7 +88,6 @@ router.post('/api/login', async (req, res) => {
 router.delete('/api/user', authenticate, async (req, res) => {
     const { userId } = req.claims;
     const deletedUser = await deleteUser(userId);
-    console.log(deletedUser);
     return res.send(deletedUser)
 })
 
